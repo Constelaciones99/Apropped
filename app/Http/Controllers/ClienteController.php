@@ -25,7 +25,7 @@ class ClienteController extends Controller
         return view('cliente.show', compact('producto'));
     }
 
-    // Formulario para ordenar producto
+    // Formulario para ordenar producto save
     public function guardarOrden(Request $request, $id)
     {
         if (!Auth::check()) {
@@ -114,11 +114,6 @@ class ClienteController extends Controller
         $usuario->direccion = $request->direccion;
         $usuario->email = $request->email;
 
-        // Si el password se cambia, lo actualizamos
-        if ($request->has('password') && $request->password) {
-            $usuario->password = Hash::make($request->password);
-        }
-
         $usuario->save();
 
         return redirect()->route('home')->with('success', 'Datos actualizados correctamente');
@@ -157,7 +152,6 @@ class ClienteController extends Controller
         $carrito = session()->get('carrito', []);
         return view('cliente.carrito', compact('carrito'));
     }
-
 
     // Eliminar un producto del carrito
     public function eliminarDelCarrito($id)

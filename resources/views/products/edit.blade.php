@@ -72,7 +72,7 @@
         <button type="submit" class="btn btn-warning mb-3">
     <i class="fas fa-sync-alt"></i> Actualizar
 </button>
-        <a href="{{ route('products.index') }}" class="btn btn-secondary mb-3">
+        <a href="{{ route('admin.index') }}" class="btn btn-secondary mb-3">
     <i class="fas fa-times"></i> Cancelar
 </a>
     </form>

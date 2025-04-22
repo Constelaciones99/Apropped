@@ -1,4 +1,3 @@
-<!-- resources/views/welcome.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -131,7 +130,7 @@
     </div>
 
     {{-- Enlace Admin (siempre visible, aunque haya sesión) --}}
-    <a href="{{ route('products.index') }}" class="admin-link">
+    <a href="{{ route('admin.index') }}" class="admin-link">
         <i class="fas fa-cogs"></i> Admin
     </a>
 </div>

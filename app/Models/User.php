@@ -2,29 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
 
+    protected $table = 'usuarios';
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     use Notifiable;
-    protected $table = 'usuarios';
 
     protected $fillable = [
         'nombre',
         'username',
         'email',
+        'password',
+        'rol',
         'celular',
         'direccion',
-        'password',
     ];
 
     /**
@@ -34,9 +33,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
+        'remember_token'
     ];
 
     /**
@@ -45,7 +42,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $appends = [
-        'profile_photo_url',
+
     ];
 
     /**
@@ -59,5 +56,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id');
+    }
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // Mutador para encriptar contraseña si se cambia o crea
+    public function setPasswordAttribute($value)
+    {
+        if ($value) {
+            $this->attributes['password'] = bcrypt($value);
+        }
     }
 }

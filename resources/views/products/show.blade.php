@@ -2,26 +2,10 @@
 
 @section('content')
 <div class="container mt-5">
-    <a href="{{ route('products.index') }}" class="btn btn-secondary mb-3">← Volver a la lista</a>
+    <a href="{{ route('admin.index') }}" class="btn btn-secondary mb-3">← Volver a la lista</a>
 
     <div class="card shadow">
         <div class="row g-0">
-
-            {{-- @if($producto->imagenes->isNotEmpty())
-
-                <h4 class="mt-4">Galería de imágenes:</h4>
-                <div class="row">
-                    @foreach ($producto->imagenes as $imagen)
-                        <div class="col-md-3 mb-3">
-                            <img src="{{ asset('storage/' . $imagen->ruta) }}" class="img-fluid rounded border" alt="Imagen del producto">
-                            @if ($imagen->es_principal)
-                                <span class="badge bg-primary mt-1">Principal</span>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @endif --}}
-
     <div class="col-md-7">
         <div class="card-body">
 

@@ -1,12 +1,9 @@
 <?php $__env->startSection('content'); ?>
 <div class="container mt-5">
-    <a href="<?php echo e(route('products.index')); ?>" class="btn btn-secondary mb-3">← Volver a la lista</a>
+    <a href="<?php echo e(route('admin.index')); ?>" class="btn btn-secondary mb-3">← Volver a la lista</a>
 
     <div class="card shadow">
         <div class="row g-0">
-
-            
-
     <div class="col-md-7">
         <div class="card-body">
 

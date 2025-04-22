@@ -1,5 +1,6 @@
 <?php $__currentLoopData = $exception->frames(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $frame): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
     <div
+
         class="sm:col-span-2"
         x-show="index === <?php echo e($loop->index); ?>"
     >

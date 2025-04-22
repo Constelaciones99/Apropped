@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Image;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
@@ -15,9 +16,14 @@ class ProductController extends Controller
     {
         $query = Product::with(['imagenPrincipal', 'categoria']);
 
+        // Búsqueda por nombre
+        if ($request->filled('busqueda')) {
+            $query->where('nombre', 'like', '%' . $request->busqueda . '%');
+        }
+
         // Filtro por categoría
         if ($request->filled('categoria')) {
-            $query->where('categoria_id', $request->categoria);
+            $query->where('categoria_id', $request->categoria); //  ¡Este era el error!
         }
 
         // Orden
@@ -39,8 +45,7 @@ class ProductController extends Controller
         return view('products.index', compact('productos', 'categorias'));
     }
 
-
-    // Mostrar un solo producto
+    // Mostrar un solo producto products.index
     public function show($id)
     {
         $producto = Product::with(['imagenes', 'categoria'])->findOrFail($id);
@@ -96,7 +101,7 @@ class ProductController extends Controller
             ]);
         }
 
-        return redirect()->route('products.index');
+        return redirect()->route('admin.index');
     }
 
 
@@ -161,16 +166,16 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'Producto actualizado correctamente');
+        return redirect()->route('admin.index')->with('success', 'Producto actualizado correctamente');
     }
 
-    // Eliminar un producto
+    // Eliminar un producto products.index
     public function destroy($id)
     {
         $producto = Product::findOrFail($id);
         $producto->delete();
 
-        return redirect()->route('products.index');
+        return redirect()->route('admin.index');
     }
 
     public function create()

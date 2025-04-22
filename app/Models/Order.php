@@ -10,32 +10,37 @@ class Order extends Model
 {
     use HasFactory;
 
+    protected $table = 'orders';
+
     protected $casts = [
         'productos' => 'array',
     ];
     protected $fillable = [
-        'producto_id',
         'user_id',
         'nombre_cliente',
         'direccion',
-        'cantidad',
+         'fecha',
         'estado',
         'productos',
-        'boleta',
     ];
 
-    public function usuario()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function user()
+    public function usuarios()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function producto()
     {
         return $this->belongsTo(Product::class, 'producto_id');
+    }
+
+    public function boleta()
+    {
+        return $this->hasOne(Boleta::class, 'order_id');
     }
 }

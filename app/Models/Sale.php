@@ -6,5 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
-    //
+    protected $table = 'ventas';
+
+    protected $fillable = [
+        'producto_id',
+        'cantidad',
+        'fecha_venta',
+    ];
+
+
 }

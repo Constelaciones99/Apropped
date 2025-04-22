@@ -1,4 +1,3 @@
-<!-- resources/views/welcome.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -131,7 +130,7 @@
     </div>
 
     
-    <a href="<?php echo e(route('products.index')); ?>" class="admin-link">
+    <a href="<?php echo e(route('admin.index')); ?>" class="admin-link">
         <i class="fas fa-cogs"></i> Admin
     </a>
 </div>

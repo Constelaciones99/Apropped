@@ -12,7 +12,6 @@
     <div>
         <span class="text-xl font-bold lg:text-2xl">Request</span>
     </div>
-
     <div class="mt-2">
         <span><?php echo e($exception->request()->method()); ?></span>
         <span class="text-gray-500"><?php echo e(Str::start($exception->request()->path(), '/')); ?></span>

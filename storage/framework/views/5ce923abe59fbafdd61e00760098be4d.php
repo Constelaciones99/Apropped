@@ -1,7 +1,7 @@
 <?php $__env->startSection('content'); ?>
 <div class="container mt-5">
     <h2 class="mb-4">Crear Producto</h2>
-    <!-- Tu formulario aquí -->
+    <!-- Tu formulario aquí-->
     <form action="<?php echo e(route('products.store')); ?>" method="POST" enctype="multipart/form-data">
         <?php echo csrf_field(); ?>
 
@@ -50,7 +50,7 @@
         </div>
 
         <div class="d-flex justify-content-between mt-4">
-    <a href="<?php echo e(route('products.index')); ?>" class="btn btn-secondary">
+    <a href="<?php echo e(route('admin.index')); ?>" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Cancelar
     </a>
 
