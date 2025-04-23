@@ -22,7 +22,12 @@ Route::get('/',[AproppedController::class,'ruta'])->name('ruta');
     Route::delete('/usuarios/{user}', [AdminController::class, 'destroy'])->name('admin.usuarios.destroy');
 
     Route::get('/reporte',[AdminController::class, 'boletas'])->name('reporte');
-    Route::get('/dashboard', [AdminController::class, 'graph'])->name('dashboard');
+    Route::get('/boletas/buscar', [AdminController::class, 'buscar'])->name('boletas.buscar');
+    Route::get('/mis-boletas', [AdminController::class, 'boletasCliente'])->name('boletas.cliente');
+
+Route::get('/dashboard', [AdminController::class, 'graph'])->name('dashboard');
+    Route::get('/dashboard/ventas-producto/{id}', [AdminController::class, 'ventasPorProducto']);
+
 
 // Usar rutas en español products.index
 Route::get('/products', [ProductController::class, 'index'])->name('admin.index');
@@ -50,6 +55,8 @@ Route::post('/tienda/{producto}/ordenar', [TiendaController::class, 'ordenar'])-
 
 
 Route::get('/cliente', [ClienteController::class, 'index'])->name('home');
+Route::get('/productos/ajax', [ClienteController::class, 'filtrarAjax'])->name('productos.filtrar.ajax');
+
 Route::get('/producto/{id}', [ClienteController::class, 'show'])->name('producto.detalle');
 Route::get('/producto/ordenar/{id}', [ClienteController::class, 'ordenar'])->name('producto.ordenar');
 Route::post('/ordenar/{id}', [ClienteController::class, 'guardarOrden'])->name('producto.ordenar.guardar');

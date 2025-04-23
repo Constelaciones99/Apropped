@@ -32,25 +32,35 @@
 
         <div class="d-flex justify-content-between mt-4">
 
-            <form action="{{ route('producto.ordenar.guardar', ['id' => 0]) }}" method="POST">
-    @csrf
-    <div class="mb-3">
-        <label for="nombre_cliente" class="form-label">Nombre</label>
-        <input type="text" name="nombre_cliente" class="form-control"
-               value="{{ auth()->user()->nombre }}" required>
-    </div>
-    <div class="mb-3">
-        <label for="direccion" class="form-label">Dirección</label>
-        <input type="text" name="direccion" class="form-control"
-               value="{{ auth()->user()->direccion }}" required>
-    </div>
-    <button type="submit" class="btn btn-success">Comprar</button>
-    <a href="{{ route('carrito.ver') }}" class="btn btn-secondary">Cancelar</a>
-</form>
+        <form action="{{ route('producto.ordenar.guardar', ['id' => 0]) }}" method="POST" id="formBoleta">
+                @csrf
+            <div class="mb-3">
+                <label for="nombre_cliente" class="form-label">Nombre</label>
+                <input type="text" name="nombre_cliente" class="form-control"
+                    value="{{ auth()->user()->nombre }}" required>
+                    <input type="hidden" name="vendedor" value="Tienda APROPPED">
+            </div>
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" name="direccion" class="form-control"
+                    value="{{ auth()->user()->direccion }}" required>
+            </div>
+            <button type="submit" class="btn btn-success">Comprar</button>
+            <a href="{{ route('carrito.ver') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
 
         </div>
     @else
         <p>No hay productos en el carrito.</p>
     @endif
 </div>
+
+    <script>
+        document.getElementById('formBoleta').addEventListener('submit', function () {
+            setTimeout(() => {
+                window.location.href = '/cliente';
+            }, 1000); // redirige después de abrir el PDF
+        });
+        </script>
+
 @endsection

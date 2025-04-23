@@ -1,7 +1,9 @@
 <?php $__env->startSection('content'); ?>
-
+<h1 class="mt-2">APROPPED</h1>
+<hr>
 <div class="container mt-5 pb-2">
-    <!-- Información del usuario en la parte superior derecha -->
+
+    <!-- Información h2 del usuario en la parte superior derecha -->
     <div class="d-flex justify-content-between">
         <?php if(auth()->check()): ?>
             <div>
@@ -14,13 +16,18 @@
 </p>
             </div>
             <div>
-                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario">
-                    <i class="fas fa-user-edit me-1"></i> Editar Usuario
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario">
+                    <i class="fas fa-user-edit me-1"></i> Editar
                 </button>
                 <div class="mt-3 text-end">
                     <a href="<?php echo e(route('carrito.ver')); ?>" class="btn btn-primary">
-                        <i class="fas fa-shopping-cart me-1"></i> Ver Carrito
+                        <i class="fas fa-shopping-cart me-1"></i> Carrito
                     </a>
+                </div>
+                <div class="mt-3 text-end">
+                <a href="<?php echo e(route('boletas.cliente')); ?>" class="btn btn-dark">
+                    <i class="fa-solid fa-file-lines"></i> Boletas
+                </a>
                 </div>
             </div>
         <?php else: ?>
@@ -131,40 +138,111 @@
 
 
 
+
+
+
 <div class="container py-0">
     <h2 class="mb-4"><i class="fas fa-store"></i> Productos disponibles</h2>
-    <hr>
-    <div class="row">
-        <?php $__currentLoopData = $productos; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $producto): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <img src="<?php echo e(asset('storage/' . $producto->imagenes->first()?->ruta ?? 'default.jpg')); ?>" class="card-img-top" alt="Producto">
-                <div class="card-body">
-                    <h5 class="card-title"><?php echo e($producto->nombre); ?></h5>
-                    <p class="card-text text-muted"><?php echo e(Str::limit($producto->descripcion, 100)); ?></p>
-                    <p class="fw-bold">$<?php echo e($producto->precio); ?></p>
-                    <a href="<?php echo e(route('producto.detalle', $producto->id)); ?>" class="btn btn-primary btn-sm">
-                        <i class="fas fa-eye"></i> Ver más
-                    </a>
-                </div>
-            </div>
+    <form id="form-filtros" method="GET" action="<?php echo e(route('home')); ?>" class="mb-4">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label for="nombre" class="form-label">Buscar por nombre</label>
+            <input type="text" name="nombre" id="nombre" value="<?php echo e(request('nombre')); ?>" class="form-control" placeholder="Ej. Zapatos">
         </div>
-        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        <div class="col-md-4">
+            <label for="categoria_id" class="form-label">Filtrar por categoría</label>
+            <select name="categoria_id" id="categoria_id" class="form-select">
+                <option value="">-- Todas --</option>
+
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="orden_precio" class="form-label">Ordenar por precio</label>
+            <select name="orden_precio" id="orden_precio" class="form-select" <?php echo e(request('nombre') || request('categoria_id') ? '' : 'disabled'); ?>>
+                <option value="">-- No ordenar --</option>
+                <option value="asc" <?php echo e(request('orden_precio') == 'asc' ? 'selected' : ''); ?>>De menor a mayor</option>
+                <option value="desc" <?php echo e(request('orden_precio') == 'desc' ? 'selected' : ''); ?>>De mayor a menor</option>
+            </select>
+        </div>
+        <div class="col-md-12 text-end">
+            <button type="submit" class="btn btn-success mt-2">
+                <i class="fas fa-search"></i> Filtrar
+            </button>
+            <a href="<?php echo e(route('home')); ?>" class="btn btn-secondary mt-2">Limpiar</a>
+        </div>
     </div>
+    <div class="d-flex justify-content-center">
+                <?php echo e($productos->links()); ?>
+
+            </div>
+</form>
+    <div id="contenedor-productos">
+                    <?php echo $__env->make('partials._productos', ['productos' => $productos], array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                <!-- Links de paginación -->
+
+    </div>
+    <hr>
+
 </div>
 
 <?php $__env->stopSection(); ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('formRegistro');
+    // 🟩 FILTROS DE PRODUCTOS
+    const filtroForm = document.getElementById('form-filtros');
+    const contenedor = document.getElementById('contenedor-productos');
+    const nombreInput = document.getElementById('nombre');
+    const categoriaSelect = document.getElementById('categoria_id');
+    const ordenSelect = document.getElementById('orden_precio');
 
-    if (form) {
-        form.addEventListener('submit', function(e) {
+    function toggleOrdenPrecio() {
+        if (nombreInput.value.trim() || categoriaSelect.value) {
+            ordenSelect.disabled = false;
+        } else {
+            ordenSelect.disabled = true;
+            ordenSelect.value = '';
+        }
+    }
+
+    toggleOrdenPrecio();
+
+    nombreInput.addEventListener('input', () => {
+        toggleOrdenPrecio();
+        filtrarProductos();
+    });
+
+    categoriaSelect.addEventListener('change', () => {
+        toggleOrdenPrecio();
+        filtrarProductos();
+    });
+
+    ordenSelect.addEventListener('change', filtrarProductos);
+
+    function filtrarProductos() {
+        const params = new URLSearchParams(new FormData(filtroForm)).toString();
+
+        fetch(`<?php echo e(route('productos.filtrar.ajax')); ?>?${params}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            contenedor.innerHTML = data.html;
+        })
+        .catch(err => console.error('Error al filtrar:', err));
+    }
+
+    // 🟨 REGISTRO DE USUARIO
+    const registroForm = document.getElementById('formRegistro');
+
+    if (registroForm) {
+        registroForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            const data = new FormData(form);
+            const data = new FormData(registroForm);
 
-            fetch(form.action, {
+            fetch(registroForm.action, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
@@ -188,8 +266,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const modal = bootstrap.Modal.getInstance(document.getElementById('modalRegistro'));
                     setTimeout(() => modal.hide(), 500);
 
-                    form.reset();
-
+                    registroForm.reset();
                     setTimeout(() => window.location.reload(), 600);
                 }
             })
@@ -206,5 +283,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+
 
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\apropped\resources\views/cliente/index.blade.php ENDPATH**/ ?>

@@ -2,20 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\Sale;
+use App\Models\Boleta;
+use App\Models\Category;
 
 class ClienteController extends Controller
 {
     // Página principal: muestra todos los productos
-    public function index()
+
+    public function index(Request $request)
     {
-        $productos = Product::with('imagenes')->get();
-        return view('cliente.index', compact('productos'));
+        $query = Product::with('imagenPrincipal', 'categoria');
+
+        if ($request->filled('nombre')) {
+            $query->where('nombre', 'like', '%' . $request->nombre . '%');
+        }
+
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->categoria_id);
+        }
+
+        if ($request->filled('orden_precio') && ($request->nombre || $request->categoria_id)) {
+            $query->orderBy('precio', $request->orden_precio === 'asc' ? 'asc' : 'desc');
+        }
+
+        $productos = $query->paginate(9);
+        $categorias = Category::all(); // Para el select
+
+        return view('cliente.index', compact('productos', 'categorias'));
+    }
+
+    public function filtrarAjax(Request $request)
+    {
+        $query = Product::with('imagenPrincipal', 'categoria');
+
+        if ($request->filled('nombre')) {
+            $query->where('nombre', 'like', '%' . $request->nombre . '%');
+        }
+
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->categoria_id);
+        }
+
+        if ($request->filled('orden_precio') && ($request->nombre || $request->categoria_id)) {
+            $query->orderBy('precio', $request->orden_precio === 'asc' ? 'asc' : 'desc');
+        }
+
+        $productos = $query->paginate(9);
+
+        return response()->json([
+            'html' => view('partials._productos', compact('productos'))->render()
+        ]);
     }
 
     // Detalle de producto
@@ -43,20 +89,71 @@ class ClienteController extends Controller
             return redirect()->route('carrito.ver')->with('error', 'Tu carrito está vacío.');
         }
 
+        // 1. Crear orden
         $orden = Order::create([
             'user_id'        => Auth::id(),
             'nombre_cliente' => $validated['nombre_cliente'],
             'direccion'      => $validated['direccion'],
             'estado'         => 'Pendiente',
-            'productos'      => json_encode($carrito), // <-- guarda todo el carrito
-            'boleta'         => null, // Luego se puede actualizar con la ruta del PDF
+            'productos'      => json_encode($carrito),
+            'boleta'         => null,
             'created_at'     => now(),
         ]);
 
-        // Vaciar el carrito
+        $productos = $carrito;
+        $fechaHoy = Carbon::today();
+        $fechaTexto = $fechaHoy->toDateString();
+
+        // 2. Registrar ventas acumulativas por fecha
+        foreach ($productos as $producto) {
+            $ventaExistente = Sale::where('producto_id', $producto['id'])
+                ->whereDate('fecha_venta', $fechaHoy)
+                ->first();
+
+            if ($ventaExistente) {
+                $ventaExistente->cantidad += $producto['cantidad'];
+                $ventaExistente->save();
+            } else {
+                Sale::create([
+                    'producto_id' => $producto['id'],
+                    'cantidad' => $producto['cantidad'],
+                    'fecha_venta' => $fechaHoy,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
+        // 3. Crear boleta
+        $boleta = Boleta::create([
+            'user_id' => Auth::id(),
+            'order_id' => $orden->id,
+            'numero' => 'storage/public/boletas/boleta_' . $orden->id . '.pdf',
+            'tipo' => 'boleta',
+            'fecha' => $fechaTexto,
+        ]);
+
+        // 4. Generar PDF y guardarlo
+        $vendedor = User::find(Auth::id());
+        $pdf = Pdf::loadView('boletas.pdf', [
+            'boleta' => $boleta,
+            'cliente' => $validated['nombre_cliente'],
+            'vendedor' => 'Tienda APROPPED',
+            'productos' => $productos,
+            'fecha' => $fechaTexto,
+        ]);
+        // 5. Limpiar carrito
         session()->forget('carrito');
 
-        return redirect()->route('home')->with('success', '¡Orden registrada con éxito!');
+        // Guardamos el PDF para luego descargarlo
+        Storage::put('public/boletas/boleta_' . $orden->id . '.pdf', $pdf->output());
+
+        // 6. Redirigir a Home con mensaje y link a boleta
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, 'boleta_' . $orden->id . '.pdf', [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 
 

@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
-
 use Barryvdh\DomPDF\Facade\Pdf;
 
 use App\Models\User;

@@ -31,13 +31,18 @@
         </div>
 
         <div class="col-md-6">
-            <h2>{{ $producto->nombre }}</h2>
-            <p>{{ $producto->descripcion }}</p>
-            <h4>S/. {{ number_format($producto->precio, 2) }}</h4>
+            <h1 class="my-2">{{ $producto->nombre }}</h1>
+            <hr>
+            <h4>Descripcion:</h4>
+            <p><i class="fa-solid fa-hand-point-right"></i> {{ $producto->descripcion }}</p>
+            <hr>
+            <h4>Precio Unitario:</h4>
+            <h5><i class="fa-solid fa-hand-point-right"></i> S/. {{ number_format($producto->precio, 2) }}</h5>
 
             <form action="{{ route('carrito.agregar', $producto->id) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-success">Agregar al Carrito</button>
+                <button type="submit" class="btn btn-success"><i class="fa-solid fa-cart-plus"></i> Agregar al Carrito </button>
+                <a class="btn btn-dark" href="{{route('home')  }}">Seguir buscando</a>
             </form>
         </div>
     </div>

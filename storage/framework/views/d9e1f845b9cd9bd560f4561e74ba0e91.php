@@ -36,6 +36,7 @@
 <!-- Bootstrap JS Bundle (sin integrity) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
+<?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
 <?php /**PATH C:\xampp\htdocs\apropped\resources\views/layouts/app.blade.php ENDPATH**/ ?>
