@@ -5,7 +5,7 @@
 <hr>
 <div class="container mt-5 pb-2">
 
-    <!-- Información h2 del usuario en la parte superior derecha -->
+    <!-- Información h2 del  usuario en la parte superior derecha -->
     <div class="d-flex justify-content-between">
         @if(auth()->check())
             <div>
@@ -13,7 +13,7 @@
                 <p><strong>Celular:</strong> {{ auth()->user()->celular }}</p>
                 <p><strong>Estado:</strong>
     <span class="align-middle">
-         Sesión Activa  <i class="fas fa-le text-success me-1" style="font-size: 0.7rem;"></i>
+         Sesión Activa  <i class="fas fa-circle text-success me-1" style="font-size: 0.7rem;"></i>
     </span>
 </p>
             </div>
@@ -91,7 +91,7 @@
 
 </div>
 
-<!-- Modal de edición de usuario editar-->
+<!-- Modal de edición de usuario editar img-->
 @if(auth()->check())
 <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -168,7 +168,7 @@
         </div>
         <div class="col-md-12 text-end">
             <button type="submit" class="btn btn-success mt-2">
-                <i class="fas fa-sh"></i> Filtrar
+                <i class="fas fa-search"></i> Filtrar
             </button>
             <a href="{{ route('home') }}" class="btn btn-secondary mt-2">Limpiar</a>
         </div>
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ordenSelect.addEventListener('change', filtrarProductos);
 
     function filtrarProductos() {
-        const params = new URLShParams(new FormData(filtroForm)).toString();
+        const params = new URLSearchParams(new FormData(filtroForm)).toString();
 
         fetch(`{{ route('productos.filtrar.ajax') }}?${params}`, {
             headers: {

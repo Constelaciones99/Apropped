@@ -101,14 +101,7 @@ class AdminController extends Controller
 
         $boletasQuery = Boleta::with('order');
 
-        if (!$usuario) {
-            return redirect()->route('home')->with('error', 'Debes iniciar sesión para ver el reporte.');
-        }
 
-        // Filtro según rol
-        if (is_null($usuario->rol) || $usuario->rol === 'cliente') {
-            $boletasQuery->where('user_id', $usuario->id);
-        }
 
         // Búsqueda
         if ($query) {

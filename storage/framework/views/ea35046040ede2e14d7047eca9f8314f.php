@@ -3,7 +3,7 @@
 <hr>
 <div class="container mt-5 pb-2">
 
-    <!-- Información h2 del usuario en la parte superior derecha -->
+    <!-- Información h2 del  usuario en la parte superior derecha -->
     <div class="d-flex justify-content-between">
         <?php if(auth()->check()): ?>
             <div>
@@ -89,7 +89,7 @@
 
 </div>
 
-<!-- Modal de edición de usuario editar-->
+<!-- Modal de edición de usuario editar img-->
 <?php if(auth()->check()): ?>
 <div class="modal fade" id="modalEditarUsuario" tabindex="-1" aria-labelledby="modalEditarUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog">

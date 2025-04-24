@@ -81,6 +81,7 @@ Route::put('/carrito/actualizar/{id}', [ClienteController::class, 'actualizarCan
 //Rutas del vendedor
 Route::get('/vender',[VendedorController::class,'vender'])->name('vendedor.index');
 Route::get('/vender-prod', [VendedorController::class, 'mostrarProductos'])->name('vendedor.mostrar');
+Route::post('/validar-vendedor', [VendedorController::class, 'validar'])->name('vendedor.validar');
 
 
 // API temporal para imágenes
@@ -92,3 +93,5 @@ Route::get('/api/producto/{id}/detalles', [VendedorController::class, 'apiDetall
 
 Route::match(['get', 'post'], '/boleta/ver', [VendedorController::class, 'verBoleta'])->name('boleta.ver');
 Route::post('/boleta', [VendedorController::class, 'generarBoleta'])->name('boleta.generar');
+
+Route::get('/tensor',[TiendaController::class,'index'])->name('area.tensor');

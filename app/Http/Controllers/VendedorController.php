@@ -28,6 +28,23 @@ class VendedorController extends Controller
         return view('vendedor.index',compact('productos', 'categorias','imagenes'));
     }
 
+    public function validar(Request $request)
+    {
+        $usuario = User::where('username', $request->username)
+            ->where('rol', 'vendedor')
+            ->first();
+
+        if (!$usuario) {
+            return response()->json(['status' => 'no_encontrado']);
+        }
+
+        if ($usuario->activo == 0) {
+            return response()->json(['status' => 'inactivo']);
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+
     public function mostrarProductos(Request $request)
     {
 

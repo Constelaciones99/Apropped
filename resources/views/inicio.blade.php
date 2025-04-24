@@ -118,22 +118,80 @@
 
     {{-- Menú de opciones --}}
     <div id="menu" class="menu">
-    <div class="btn-card-container">
-        <a href="{{ route('home') }}" class="btn-card">
-            <i class="fas fa-shopping-cart icon"></i>
-            <span>Comprar</span>
-        </a>
-        <a href="{{ route('vendedor.index') }}" class="btn-card">
-            <i class="fas fa-store icon"></i>
-            <span>Vender</span>
+        <div class="btn-card-container">
+            <a href="{{ route('home') }}" class="btn-card">
+                <i class="fas fa-shopping-cart icon"></i>
+                <span>Comprar</span>
+            </a>
+            <a class="btn btn-card" data-bs-toggle="modal" data-bs-target="#modalVender">
+                <i class="fas fa-store icon"></i>
+                <span>Vender</span>
+            </a>
+        </div>
+
+        {{-- Enlace Admin (siempre visible, aunque haya sesión) --}}
+        <a href="#" class="admin-link" data-bs-toggle="modal" data-bs-target="#modalAdmin">
+            <i class="fas fa-cogs"></i> Admin
         </a>
     </div>
 
-    {{-- Enlace Admin (siempre visible, aunque haya sesión) --}}
-    <a href="{{ route('admin.index') }}" class="admin-link">
-        <i class="fas fa-cogs"></i> Admin
-    </a>
-</div>
+    <!-- Modal de Vendedor -->
+    <div class="modal fade" id="modalVender" tabindex="-1" aria-labelledby="modalVenderLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="formVender">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title text-dark" id="modalVenderLabel">Ingreso de Vendedor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="usernameVendedor" class="form-label text-dark">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="usernameVendedor" required>
+                        </div>
+                        <div id="alertVendedor" class="alert alert-danger d-none" role="alert">
+                            <!-- Aquí va el mensaje de error -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Ingresar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Admin -->
+    <div class="modal fade" id="modalAdmin" tabindex="-1" aria-labelledby="modalAdminLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="formAdmin">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title txt-dark text-dark" id="modalAdminLabel">Ingreso de Administrador</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3 text-dark">
+                            <label for="usernameAdmin" class="form-label text-dark">Usuario</label>
+                            <input type="text" class="form-control" id="usernameAdmin" required>
+                        </div>
+                        <div class="mb-3 text-dark">
+                            <label for="passwordAdmin" class="form-label text-dark">Contraseña</label>
+                            <input type="password" class="form-control" id="passwordAdmin" required>
+                        </div>
+                        <div id="alertAdmin" class="alert alert-danger d-none" role="alert">
+                            <!-- Mensaje de error -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Ingresar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
 
     <script>
@@ -154,6 +212,69 @@
                 }, 2000);
             }
         });
+
+
+
+        // 🟥 VALIDAR VENDEDOR
+    const formVender = document.getElementById('formVender');
+    const alertVendedor = document.getElementById('alertVendedor');
+    const inputUsername = document.getElementById('usernameVendedor');
+
+    formVender.addEventListener('submit', function (e) {
+        e.preventDefault();
+        alertVendedor.classList.add('d-none');
+        const username = inputUsername.value.trim();
+
+        fetch(`/validar-vendedor`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ username })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'inactivo') {
+                alertVendedor.textContent = 'Usted es un usuario inactivo, no puede ingresar. No tiene permisos';
+                alertVendedor.classList.remove('d-none');
+            } else if (data.status === 'ok') {
+                window.location.href = "{{ route('vendedor.index') }}";
+            } else {
+                alertVendedor.textContent = 'Usuario no encontrado o no tiene permisos.';
+                alertVendedor.classList.remove('d-none');
+            }
+        })
+        .catch(err => {
+            alertVendedor.textContent = 'Error al validar. Intente nuevamente.';
+            alertVendedor.classList.remove('d-none');
+            console.error(err);
+        });
+    });
+
+    const formAdmin = document.getElementById('formAdmin');
+    const alertAdmin = document.getElementById('alertAdmin');
+
+    formAdmin.addEventListener('submit', function (e) {
+        e.preventDefault();
+        alertAdmin.classList.add('d-none');
+
+        const username = document.getElementById('usernameAdmin').value.trim();
+        const password = document.getElementById('passwordAdmin').value;
+
+        if (username === 'admin' && password === 'admin') {
+            window.location.href = "{{ route('admin.index') }}";
+        } else {
+            alertAdmin.textContent = 'Usuario o contraseña incorrectos.';
+            alertAdmin.classList.remove('d-none');
+        }
+    });
+
+
+
+
+
     </script>
+
 </body>
 </html>

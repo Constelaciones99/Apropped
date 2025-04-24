@@ -4,10 +4,16 @@
 <div class="container py-4">
     <h1 class="text-center fw-bold mb-4">APROPPED</h1>
     <button class="btn btn-dark mb-5"><a href="{{ route('reporte') }}" class="text-white fw-bold"><i class="fa-solid fa-barcode"></i> Boletas</a></button>
+    <h3>
+
+    </h3>
     <!-- FILTROS -->
     <div class="row mb-4">
-        <div class="col-md-4">
-            <input type="text" id="buscador" class="form-control" placeholder="Buscar producto por nombre..." onkeyup="filtrarProductos()">
+        <div class="col-md-4 d-flex">
+            <input type="text" id="buscador" class="form-control rounded-0" placeholder="Buscar producto por nombre..." onkeyup="filtrarProductos()" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+            <a href="{{ route('area.tensor') }}" class="btn btn-dark rounded-0 pt-2 pb-0" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+            <i class="fa-solid fa-brain"></i>
+            </a>
         </div>
         <div class="col-md-4">
             <select id="filtroCategoria" class="form-select" onchange="filtrarProductos()">

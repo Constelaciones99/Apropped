@@ -17,7 +17,20 @@
     <!-- Bootstrap CSS (sin integrity) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 
-
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .result-img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .similarity {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+    </style>
 </head>
 <body id="app-layout">
 

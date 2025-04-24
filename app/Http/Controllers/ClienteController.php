@@ -67,6 +67,7 @@ class ClienteController extends Controller
     // Detalle de producto
     public function show($id)
     {
+
         $producto = Product::with('imagenes')->findOrFail($id);
         return view('cliente.show', compact('producto'));
     }
@@ -172,6 +173,7 @@ class ClienteController extends Controller
         $usuario->username = $request->username;
         $usuario->celular = $request->celular;
         $usuario->direccion = $request->direccion;
+        $usuario->rol='cliente';
         $usuario->save();
 
         Auth::login($usuario); // Lo logueas directamente
