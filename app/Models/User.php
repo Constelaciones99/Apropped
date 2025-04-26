@@ -29,6 +29,15 @@ class User extends Authenticatable
         'remember_token'
     ];
 
+    public function favoritos()
+    {
+        // Devuelve los productos que el usuario ha marcado como favoritos
+        $detalleVenta = Detail::where('id_usuario', $this->id)->first();
+
+        // Verifica si hay detalles de venta y si tiene productos guardados
+        return $detalleVenta ? json_decode($detalleVenta->productos, true) : [];
+    }
+
     /**
      * The accessors to append to the model's array form.
      *

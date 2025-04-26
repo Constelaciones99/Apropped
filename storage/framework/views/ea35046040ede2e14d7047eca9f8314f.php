@@ -32,30 +32,35 @@
 
             <hr>
 
+        
+    <div class="d-flex flex-wrap justify-content-start gap-3 align-items-center mt-3">
+
+    
+            <a class="btn btn-secondary" href="<?php echo e(route('area.tensor')); ?>" title="Cambiar tema">
+                <i class="fa-solid fa-eye-dropper"></i>
+            </a>
+
+    
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario">
+                <i class="fas fa-user-edit me-1"></i> Editar
+            </button>
+
             
-            <div class="d-flex flex-wrap justify-content-start gap-3 align-items-center mt-3">
+            <a href="<?php echo e(route('carrito.ver')); ?>" class="btn btn-primary">
+                <i class="fas fa-shopping-cart me-1"></i> Carrito
+            </a>
 
-                
-                <a class="btn btn-secondary" href="<?php echo e(route('area.tensor')); ?>"  title="Cambiar tema">
-                    <i class="fa-solid fa-eye-dropper"></i>
-                </a>
+            
+            <a href="<?php echo e(route('boletas.cliente')); ?>" class="btn btn-dark">
+                <i class="fa-solid fa-file-lines me-1"></i> Boletas
+            </a>
 
-                
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario">
-                    <i class="fas fa-user-edit me-1"></i> Editar
-                </button>
+            
+            <a href="<?php echo e(route('favoritos')); ?>" class="btn btn-success">
+                <i class="fas fa-heart me-1"></i> Guardados
+            </a>
 
-                
-                <a href="<?php echo e(route('carrito.ver')); ?>" class="btn btn-primary">
-                    <i class="fas fa-shopping-cart me-1"></i> Carrito
-                </a>
-
-                
-                <a href="<?php echo e(route('boletas.cliente')); ?>" class="btn btn-dark">
-                    <i class="fa-solid fa-file-lines me-1"></i> Boletas
-                </a>
-
-            </div>
+        </div>
 
         <?php else: ?>
             <div>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\Category;  // Corregido el uso
 use App\Models\Detail;    // Corregido el uso
 use App\Models\Image;     // Corregido el uso
@@ -24,6 +25,13 @@ class Product extends Model
         'stock',
         'categoria_id',
     ];
+
+    public function esFavorito()
+    {
+        $user = Auth::user();
+        return $user && $user->favoritos()->where('producto_id', $this->id)->exists();
+    }
+
 
     // Relación: Un producto pertenece a una categoría
     public function categoria()

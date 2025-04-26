@@ -12,26 +12,24 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TensorController;
 
     Route::get('/',[AproppedController::class,'ruta'])->name('ruta');
+    //EVITAR QUE VAYA A INICIO.BLADE SI YA INICIO SESION productos.filtrar
+    Route::get('/', function () {
+        if (Auth::check()) {
+            $rol = Auth::user()->rol;
 
-//EVITAR QUE VAYA A INICIO.BLADE SI YA INICIO SESION productos.filtrar
-Route::get('/', function () {
-    if (Auth::check()) {
-        $rol = Auth::user()->rol;
-
-        if ($rol === 'vendedor') {
-            return redirect()->route('vendedor.index'); // O la ruta que uses para vender
-        } elseif ($rol === 'cliente') {
-            return redirect()->route('home'); // Ruta del cliente
+            if ($rol === 'vendedor') {
+                return redirect()->route('vendedor.index'); // O la ruta que uses para vender
+            } elseif ($rol === 'cliente') {
+                return redirect()->route('home'); // Ruta del cliente
+            }
         }
-    }
 
-    return view('inicio');
-});
-
+        return view('inicio');
+    });
 
 
 
-Route::get('/usuarios', [AdminController::class, 'index'])->name('admin.usuarios.index');
+    Route::get('/usuarios', [AdminController::class, 'index'])->name('admin.usuarios.index');
     Route::get('/usuarios/create', [AdminController::class, 'create'])->name('admin.usuarios.create');
     Route::post('/usuarios', [AdminController::class, 'store'])->name('admin.usuarios.store');
     Route::get('/usuarios/{user}/edit', [AdminController::class, 'edit'])->name('admin.usuarios.edit');
@@ -127,3 +125,6 @@ Route::post('/login-admin',[ClienteController::class, 'loginAdmin'])->name('admi
 
 
 Route::post('/favorito-toggle', [ClienteController::class, 'toggleFavorito'])->name('favorito.toggle');
+Route::get('/favoritos', [ClienteController::class, 'favoritos'])->name('favoritos');
+Route::delete('/favoritos/{productoId}', [ClienteController::class, 'deleteFav'])->name('DeleteFav');
+Route::post('/favorito/{producto}/toggle', [ClienteController::class, 'toggle'])->name('toggle.show.favorito');

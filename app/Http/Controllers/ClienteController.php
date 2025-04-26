@@ -163,7 +163,6 @@ class ClienteController extends Controller
         ]);
     }
 
-
     // Detalle de producto
     public function show($id)
     {
@@ -371,34 +370,118 @@ class ClienteController extends Controller
 
     public function toggleFavorito(Request $request)
     {
-         if (!Auth::check()) {
-        return redirect()->back()->with('error', 'Debes iniciar sesión.');
+        if (!Auth::check()) {
+            return redirect()->back()->with('error', 'Debes iniciar sesión.');
+        }
+
+        $productoId = $request->input('producto_id');
+        $usuarioId = Auth::id();
+
+        $detalleVenta = Detail::firstOrCreate(
+            ['id_usuario' => $usuarioId],
+            ['productos' => json_encode([]), 'fecha' => now()]
+        );
+
+        $productos = json_decode($detalleVenta->productos, true) ?? [];
+
+        if (in_array($productoId, $productos)) {
+            $productos = array_filter($productos, function ($id) use ($productoId) {
+                return $id != $productoId;
+            });
+            $mensaje = 'Producto eliminado de favoritos.';
+        } else {
+            $productos[] = $productoId;
+            $mensaje = 'Producto guardado en favoritos.';
+        }
+
+        $detalleVenta->productos = json_encode(array_values($productos));
+        $detalleVenta->save();
+
+        return redirect()->back()->with('success', $mensaje);
     }
 
-    $productoId = $request->input('producto_id');
-    $usuarioId = Auth::id();
+    public function toggle(Request $request, $producto)
+    {
+        if (!Auth::check()) {
+            return redirect()->back()->with('error', 'Debes iniciar sesión.');
+        }
 
-    $detalleVenta = Detail::firstOrCreate(
-        ['id_usuario' => $usuarioId],
-        ['productos' => json_encode([]), 'fecha' => now()]
-    );
+        $usuario = Auth::user();
 
-    $productos = json_decode($detalleVenta->productos, true) ?? [];
+        // Cargar detalle o crear uno nuevo
+        $detalleVenta = Detail::firstOrCreate(
+            ['id_usuario' => $usuario->id],
+            ['productos' => json_encode([]), 'fecha' => now()]
+        );
 
-    if (in_array($productoId, $productos)) {
+        $productosFavoritos = json_decode($detalleVenta->productos, true) ?? [];
+
+        // Verificamos si ya existe
+        if (in_array($producto, $productosFavoritos)) {
+            $productosFavoritos = array_filter($productosFavoritos, fn($id) => $id != $producto);
+            $mensaje = 'Producto eliminado de favoritos.';
+        } else {
+            $productosFavoritos[] = $producto;
+            $mensaje = 'Producto guardado en favoritos.';
+        }
+
+        // Guardar cambios
+        $detalleVenta->productos = json_encode(array_values($productosFavoritos));
+        $detalleVenta->save();
+
+        return redirect()->back()->with('success', $mensaje);
+    }
+
+    public function favoritos()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('home');  // Redirige a login si no hay sesión activa
+        }
+
+        $usuarioId = Auth::id();  // Obtener el ID del usuario autenticado
+
+        // Buscar el detalle de venta que contiene los productos favoritos
+        $detalleVenta = Detail::where('id_usuario', $usuarioId)->first();
+
+        // Si el detalle de venta no existe, redirige o muestra mensaje de error
+        if (!$detalleVenta) {
+            return redirect()->route('home')->with('error', 'No tienes productos favoritos.');
+        }
+
+        // Decodificar los productos favoritos
+        $productosFavoritos = json_decode($detalleVenta->productos, true) ?? [];
+
+        // Obtener los productos que están guardados en favoritos
+        $productos = Product::whereIn('id', $productosFavoritos)->get();
+
+        return view('cliente.favoritos', compact('productos'));
+    }
+
+    // En el controlador
+    public function deleteFav($productoId)
+    {
+        if (!Auth::check()) {
+            return response()->json(['success' => false]);
+        }
+
+        $usuarioId = Auth::id();
+        $detalleVenta = Detail::where('id_usuario', $usuarioId)->first();
+
+        if (!$detalleVenta) {
+            return redirect()->route('favoritos')->with('error', 'No tienes productos favoritos.');
+        }
+
+        $productos = json_decode($detalleVenta->productos, true) ?? [];
+
+        // Filtrar el producto a eliminar
         $productos = array_filter($productos, function ($id) use ($productoId) {
             return $id != $productoId;
         });
-        $mensaje = 'Producto eliminado de favoritos.';
-    } else {
-        $productos[] = $productoId;
-        $mensaje = 'Producto guardado en favoritos.';
-    }
 
-    $detalleVenta->productos = json_encode(array_values($productos));
-    $detalleVenta->save();
+        $detalleVenta->productos = json_encode(array_values($productos)); // Actualizamos la lista de productos
+        $detalleVenta->save();
 
-    return redirect()->back()->with('success', $mensaje);
+        return redirect()->route('favoritos')->with('success', 'Producto eliminado de tus favoritos.');
     }
 }
 

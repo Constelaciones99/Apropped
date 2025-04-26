@@ -34,30 +34,35 @@
 
             <hr>
 
-            {{-- Acciones del usuario --}}
-            <div class="d-flex flex-wrap justify-content-start gap-3 align-items-center mt-3">
+        {{-- Acciones del usuario --}}
+    <div class="d-flex flex-wrap justify-content-start gap-3 align-items-center mt-3">
 
-                {{-- Botón de modo (ej: selector de color, lo que sea) --}}
-                <a class="btn btn-secondary" href="{{ route('area.tensor') }}"  title="Cambiar tema">
-                    <i class="fa-solid fa-eye-dropper"></i>
-                </a>
+    {{-- Botón de modo (ej: selector de color, lo que sea) --}}
+            <a class="btn btn-secondary" href="{{ route('area.tensor') }}" title="Cambiar tema">
+                <i class="fa-solid fa-eye-dropper"></i>
+            </a>
 
-                {{-- Botón editar usuario --}}
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario">
-                    <i class="fas fa-user-edit me-1"></i> Editar
-                </button>
+    {{-- Botón editar usuario --}}
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEditarUsuario">
+                <i class="fas fa-user-edit me-1"></i> Editar
+            </button>
 
-                {{-- Botón carrito --}}
-                <a href="{{ route('carrito.ver') }}" class="btn btn-primary">
-                    <i class="fas fa-shopping-cart me-1"></i> Carrito
-                </a>
+            {{-- Botón carrito --}}
+            <a href="{{ route('carrito.ver') }}" class="btn btn-primary">
+                <i class="fas fa-shopping-cart me-1"></i> Carrito
+            </a>
 
-                {{-- Botón boletas --}}
-                <a href="{{ route('boletas.cliente') }}" class="btn btn-dark">
-                    <i class="fa-solid fa-file-lines me-1"></i> Boletas
-                </a>
+            {{-- Botón boletas --}}
+            <a href="{{ route('boletas.cliente') }}" class="btn btn-dark">
+                <i class="fa-solid fa-file-lines me-1"></i> Boletas
+            </a>
 
-            </div>
+            {{-- Botón de guardados --}}
+            <a href="{{ route('favoritos') }}" class="btn btn-success">
+                <i class="fas fa-heart me-1"></i> Guardados
+            </a>
+
+        </div>
 
         @else
             <div>
