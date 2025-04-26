@@ -3,6 +3,13 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Lista de Productos</h1>
+        
+                <form method="POST" action="<?php echo e(route('logout')); ?>" class="ms-auto">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit" class="bg-transparent border-0" title="Cerrar sesión">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
 
 
         <div class="d-flex flex-row">

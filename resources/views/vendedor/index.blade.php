@@ -1,12 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
+
+
+
+
 <div class="container py-4">
     <h1 class="text-center fw-bold mb-4">APROPPED</h1>
     <button class="btn btn-dark mb-5"><a href="{{ route('reporte') }}" class="text-white fw-bold"><i class="fa-solid fa-barcode"></i> Boletas</a></button>
     <h3>
+        <form method="POST" action="{{ route('logout') }}"  style="position: absolute; top: 20px; right: 20px;">
+            @csrf
+            <button type="submit" class="bg-transparent border-0">
+                <i class="fa-solid fa-power-off text-danger"></i>
+            </button>
+        </form>
 
     </h3>
+
     <!-- FILTROS -->
     <div class="row mb-4">
         <div class="col-md-4 d-flex">
@@ -80,8 +91,12 @@
 @endsection
 
 <script>
+
 let carrito = {};
 
+
+
+//
 document.addEventListener('DOMContentLoaded', () => {
     cargarCarrito();
     setupDelegatedEvents();

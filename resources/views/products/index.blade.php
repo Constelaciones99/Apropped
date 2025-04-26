@@ -5,6 +5,13 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Lista de Productos</h1>
+        {{-- Botón cerrar sesión --}}
+                <form method="POST" action="{{ route('logout') }}" class="ms-auto">
+                    @csrf
+                    <button type="submit" class="bg-transparent border-0" title="Cerrar sesión">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
 
 
         <div class="d-flex flex-row">

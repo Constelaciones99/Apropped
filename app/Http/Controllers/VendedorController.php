@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -27,6 +27,29 @@ class VendedorController extends Controller
 
         return view('vendedor.index',compact('productos', 'categorias','imagenes'));
     }
+
+    public function validarVendedor(Request $request)
+    {
+        $username = $request->input('username');
+
+        $user = User::where('username', $username)
+            ->where('rol', 'vendedor')
+            ->first();
+
+        if (!$user) {
+            return back()->with('error', 'Usuario no encontrado.');
+        }
+
+        if ($user->activo != 1) {
+            return back()->with('error', 'Usuario inactivo. No tiene permisos.');
+        }
+
+        // Autenticación
+        Auth::login($user);
+
+        return redirect()->route('vendedor.index');
+    }
+
 
     public function validar(Request $request)
     {

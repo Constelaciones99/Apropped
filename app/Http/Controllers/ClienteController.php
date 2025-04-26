@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -14,6 +15,8 @@ use App\Models\Order;
 use App\Models\Sale;
 use App\Models\Boleta;
 use App\Models\Category;
+use App\Models\Detail;
+
 
 class ClienteController extends Controller
 {
@@ -38,7 +41,103 @@ class ClienteController extends Controller
         $productos = $query->paginate(9);
         $categorias = Category::all(); // Para el select
 
-        return view('cliente.index', compact('productos', 'categorias'));
+        $favoritos = [];
+
+        if (auth::check()) {
+            $detalleVenta = Detail::where('id_usuario', Auth::user()->id)->first();
+            if ($detalleVenta) {
+                $favoritos = json_decode($detalleVenta->productos, true) ?? [];
+            }
+        }
+
+        return view('cliente.index', compact('productos', 'categorias', 'favoritos'));
+    }
+
+    public function loginCliente(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $usuario = User::where('username', $request->username)->first();
+
+        if (!$usuario) {
+            return back()->with('error', 'usuarios incorrectas')->withInput();
+        }
+
+
+
+        if (!Hash::check($request->password, $usuario->password)) {
+
+            return back()->with('error', 'Credenciales incorrectas')->withInput();
+        }
+
+        Auth::login($usuario);
+
+        // Redirigir según el rol
+        if ($usuario->rol === 'cliente') {
+            return redirect()->route('home');
+        } elseif ($usuario->rol === 'vendedor') {
+            return redirect()->route('vendedor.index');
+        }
+
+        return redirect()->route('home'); // Por defecto
+    }
+
+    public function loginAdmin(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // Validación básica de admin
+        if ($request->username === 'admin' && $request->password === 'admin') {
+            // Buscar al usuario admin (por si ya está en la DB)
+            $admin = User::where('username', 'admin')->first();
+
+            // Si no existe, lo creamos
+            if (!$admin) {
+                $admin = User::create([
+                    'username' => 'admin',
+                    'password' => bcrypt('admin'),
+                    'nombre' => 'Administrador',
+                    'rol' => 'admin',
+                    'celular' => '000000000',
+                    'direccion' => 'Oficina Central',
+                ]);
+            }
+
+            Auth::login($admin);
+            return redirect()->route('admin.index'); // o a donde tú desees redirigir
+        }
+
+        return back()->with('error', 'Credenciales incorrectas');
+    }
+
+    public function registrar(Request $request)
+    {
+        $request->validate([
+            'nombre' => 'required',
+            'username' => 'required|unique:usuarios',
+            'password'=>'required',
+            'celular' => 'required| digits:9',
+            'direccion' => 'required',
+        ]);
+
+        $user = User::create([
+            'nombre' => $request['nombre'],
+            'password' =>$request->password,
+            'username' => $request['username'],
+            'celular' => $request['celular'],
+            'direccion' => $request['direccion'],
+            'rol' => 'cliente',
+        ]);
+
+        Auth::login($user); // Lo logueas directamente
+
+        return redirect()->route('home');
     }
 
     public function filtrarAjax(Request $request)
@@ -53,8 +152,8 @@ class ClienteController extends Controller
             $query->where('categoria_id', $request->categoria_id);
         }
 
-        if ($request->filled('orden_precio') && ($request->nombre || $request->categoria_id)) {
-            $query->orderBy('precio', $request->orden_precio === 'asc' ? 'asc' : 'desc');
+        if (in_array($request->orden_precio, ['asc', 'desc'])) {
+            $query->orderBy('precio', $request->orden_precio);
         }
 
         $productos = $query->paginate(9);
@@ -64,6 +163,7 @@ class ClienteController extends Controller
         ]);
     }
 
+
     // Detalle de producto
     public function show($id)
     {
@@ -72,7 +172,7 @@ class ClienteController extends Controller
         return view('cliente.show', compact('producto'));
     }
 
-    // Formulario para ordenar producto save
+    // Formulario para ordenar producto save hash
     public function guardarOrden(Request $request, $id)
     {
         if (!Auth::check()) {
@@ -155,30 +255,6 @@ class ClienteController extends Controller
         }, 'boleta_' . $orden->id . '.pdf', [
             'Content-Type' => 'application/pdf',
         ]);
-    }
-
-
-
-    public function registrar(Request $request)
-    {
-        $request->validate([
-            'nombre' => 'required',
-            'username' => 'required|unique:usuarios',
-            'celular' => 'required| digits:9',
-            'direccion' => 'required',
-        ]);
-
-        $usuario = new User();
-        $usuario->nombre = $request->nombre;
-        $usuario->username = $request->username;
-        $usuario->celular = $request->celular;
-        $usuario->direccion = $request->direccion;
-        $usuario->rol='cliente';
-        $usuario->save();
-
-        Auth::login($usuario); // Lo logueas directamente
-
-        return response()->json(['success' => true]);
     }
 
     public function ordenar($id)
@@ -293,6 +369,37 @@ class ClienteController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function toggleFavorito(Request $request)
+    {
+         if (!Auth::check()) {
+        return redirect()->back()->with('error', 'Debes iniciar sesión.');
+    }
+
+    $productoId = $request->input('producto_id');
+    $usuarioId = Auth::id();
+
+    $detalleVenta = Detail::firstOrCreate(
+        ['id_usuario' => $usuarioId],
+        ['productos' => json_encode([]), 'fecha' => now()]
+    );
+
+    $productos = json_decode($detalleVenta->productos, true) ?? [];
+
+    if (in_array($productoId, $productos)) {
+        $productos = array_filter($productos, function ($id) use ($productoId) {
+            return $id != $productoId;
+        });
+        $mensaje = 'Producto eliminado de favoritos.';
+    } else {
+        $productos[] = $productoId;
+        $mensaje = 'Producto guardado en favoritos.';
+    }
+
+    $detalleVenta->productos = json_encode(array_values($productos));
+    $detalleVenta->save();
+
+    return redirect()->back()->with('success', $mensaje);
+    }
 }
 
 

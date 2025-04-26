@@ -99,7 +99,7 @@ function cargarCarrito() {
     let precio = document.getElementById('filtroPrecio').value;
 
     let url = `/vender-prod?page=${page}&nombre=${nombre}&categoria_id=${categoria}&precio=${precio}`;
-
+    console.log(url)
     fetch(url, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest' // 👈 este es la clave

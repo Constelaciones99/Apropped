@@ -16,15 +16,8 @@ class User extends Authenticatable
      */
     use Notifiable;
 
-    protected $fillable = [
-        'nombre',
-        'username',
-        'email',
-        'password',
-        'rol',
-        'celular',
-        'direccion',
-    ];
+    protected $fillable = ['nombre', 'username','email', 'password', 'celular', 'direccion', 'rol','activo'];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -70,8 +63,8 @@ class User extends Authenticatable
     // Mutador para encriptar contraseña si se cambia o crea
     public function setPasswordAttribute($value)
     {
-        if ($value) {
+
             $this->attributes['password'] = bcrypt($value);
-        }
+
     }
 }

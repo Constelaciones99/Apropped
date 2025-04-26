@@ -17,7 +17,7 @@
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Buscando...</span>
     </div>
-    <p class="mt-2 text-muted">Comparando imagen, por favor espera...</p>
+    <p class="mt-2 text-muted">Buscando producto, por favor espera...</p>
   </div>
 
   <!-- Resultados -->
@@ -34,7 +34,6 @@
     <div id="others" class="row g-4"></div>
   </div>
 </div>
-
 <script>
 document.getElementById("uploadForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -51,11 +50,13 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
     });
 
     const data = await res.json();
+
     if (!data.best_match) {
-        document.getElementById("loader").classList.add("d-none");
-        alert("No se encontraron coincidencias o ocurrió un error.");
-        return;
-        }
+      document.getElementById("loader").classList.add("d-none");
+      alert("No se encontraron coincidencias o ocurrió un error.");
+      return;
+    }
+
     document.getElementById("loader").classList.add("d-none");
     document.getElementById("resultSection").classList.remove("d-none");
 
@@ -71,15 +72,63 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
         <div class="col-md-3">
           <div class="card shadow-sm">
             <img src="/storage/productos/${img.filename}" class="card-img-top" alt="Similar">
-
-
-
             <div class="card-body text-center p-2">
               <p class="mb-0 fw-medium">${img.similarity}% de similitud</p>
             </div>
           </div>
         </div>`;
     });
+
+    // 🔁 MOSTRAR PRODUCTO EN OTRA VISTA
+    const nombreImagen = data.best_match.filename.replace("productos/", "");
+
+    const formRedirect = document.createElement("form");
+    formRedirect.method = "POST";
+    formRedirect.action = "/tensor/producto";
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "imagen";
+    input.value = nombreImagen;
+
+    const token = document.createElement("input");
+    token.type = "hidden";
+    token.name = "_token";
+    token.value = "{{ csrf_token() }}";
+
+    formRedirect.appendChild(input);
+    formRedirect.appendChild(token);
+    document.body.appendChild(formRedirect);
+    formRedirect.submit();
+
+    // Preparar datos para redireccionar a la vista con todos los productos similares
+        const otrosFiltrados = data.others.slice(0, 4).map(img => ({
+        filename: img.filename,
+        similarity: img.similarity
+        }));
+
+        const fullForm = document.createElement("form");
+        fullForm.method = "POST";
+        fullForm.action = "/tensor/producto";
+
+        const mainInput = document.createElement("input");
+        mainInput.type = "hidden";
+        mainInput.name = "imagen";
+        mainInput.value = nombreImagen;
+
+
+
+        // Añadir imagenes similares como JSON
+        const similaresInput = document.createElement("input");
+        similaresInput.type = "hidden";
+        similaresInput.name = "similares";
+        similaresInput.value = JSON.stringify(otrosFiltrados);
+
+        fullForm.appendChild(mainInput);
+        fullForm.appendChild(similaresInput);
+        fullForm.appendChild(token);
+        document.body.appendChild(fullForm);
+        fullForm.submit();
 
   } catch (error) {
     document.getElementById("loader").classList.add("d-none");
@@ -88,4 +137,6 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
   }
 });
 </script>
+
+
 @endsection

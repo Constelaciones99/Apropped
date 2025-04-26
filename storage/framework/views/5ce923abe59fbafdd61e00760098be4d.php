@@ -27,7 +27,7 @@
 
         <div class="form-group mb-3">
             <label for="precio">Precio</label>
-            <input type="number" name="precio" class="form-control" id="precio" required>
+            <input type="number" onkeyup="/^\d+(?:\.\d{1,2})?$/.test(this.value)?'inherit':this.value=''" name="precio" class="form-control" id="precio" required>
         </div>
 
         <div class="form-group mb-3">
