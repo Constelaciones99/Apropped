@@ -12,6 +12,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TensorController;
 
     Route::get('/',[AproppedController::class,'ruta'])->name('ruta');
+    
     //EVITAR QUE VAYA A INICIO.BLADE SI YA INICIO SESION productos.filtrar
     Route::get('/', function () {
         if (Auth::check()) {
@@ -128,3 +129,22 @@ Route::post('/favorito-toggle', [ClienteController::class, 'toggleFavorito'])->n
 Route::get('/favoritos', [ClienteController::class, 'favoritos'])->name('favoritos');
 Route::delete('/favoritos/{productoId}', [ClienteController::class, 'deleteFav'])->name('DeleteFav');
 Route::post('/favorito/{producto}/toggle', [ClienteController::class, 'toggle'])->name('toggle.show.favorito');
+
+Route::get('/listar-imagenes', function () {
+    try {
+        $path = public_path('storage/productos');
+        
+        if (!file_exists($path)) {
+            return response()->json(['error' => 'Directorio no existe'], 404);
+        }
+        
+        $files = array_diff(scandir($path), ['.', '..']);
+        return response()->json(array_values($files));
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Error interno',
+            'detalles' => $e->getMessage()
+        ], 500);
+    }
+});

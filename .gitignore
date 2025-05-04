@@ -21,3 +21,21 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyd
+*.pyo
+*.so
+venv/
+env/
+image_api/venv/
+
+# TensorFlow específico
+image_api/venv/Lib/site-packages/tensorflow/
+
+# Entornos virtuales
+.vscode/
+.idea/

@@ -2,9 +2,6 @@
 
 @section('content')
 
-
-
-
 <div class="container py-4">
     <h1 class="text-center fw-bold mb-4">APROPPED</h1>
     <button class="btn btn-dark mb-5"><a href="{{ route('reporte') }}" class="text-white fw-bold"><i class="fa-solid fa-barcode"></i> Boletas</a></button>

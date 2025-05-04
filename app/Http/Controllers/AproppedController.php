@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 class AproppedController extends Controller
 {
     public function ruta(){
-        if (Auth::check()) {
+        if(Auth::check()) {
             if (Auth::user()->rol === 'vendedor') {
                 return redirect()->route('vendedor.index');
             } elseif (Auth::user()->rol === 'admin') {
