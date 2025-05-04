@@ -1,0 +1,1 @@
+echo 'php artisan storage:link' >> .profile
