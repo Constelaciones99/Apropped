@@ -1,1 +1,1 @@
-echo 'php artisan storage:link' >> .profile
+echo 'rm storage' >> .profile
